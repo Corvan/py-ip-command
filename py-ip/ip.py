@@ -3,13 +3,10 @@ import subprocess
 from typing import Dict
 
 
-def ip():
-    return IP()
-
-
 class IP:
 
-    def addr(self) -> Dict:
+    @staticmethod
+    def addr() -> Dict:
         output = IP.run('addr').stdout.decode()
         regexes = {"numbers": '(?P<number>[0-9]+: )',
                    "interfaces": '(?P<interface>[0-9a-zA-Z-@]+: )',
@@ -19,43 +16,34 @@ class IP:
                                  f"{regexes['interfaces']}"
                                  f"{regexes['flags']}")
 
-        interfaces = {int(self._remove_colon(i[0])): {"name": self._remove_colon(i[1]),
-                                                      "flags": self._remove_angle_brackets(i[2])}
-                      for i in re.findall(all_pattern, output)}
+        interfaces = dict()
+        for find in re.finditer(all_pattern, output):
+            number = int(IP._remove_colon(find.group('number')))
+            name = IP._remove_colon(find.group('interface'))
+            flags = IP._remove_angle_brackets(find.group('flags')).split(",")
+            interfaces[number] = {"name": name,
+                                  "flags": flags}
 
-        definition = re.split(all_pattern, output)
-        definition.pop()
-        for interface_number in interfaces:
-            definition.pop()
-            definition.pop()
-            interfaces[interface_number]['definition'] = definition.pop()
-
-        pass
+        return interfaces
 
     @staticmethod
     def run(command: str) -> subprocess.CompletedProcess:
         ip_path = subprocess.run(['which', 'ip'], capture_output=True).stdout.decode().strip()
         return subprocess.run([ip_path, command], capture_output=True)
 
-    def _remove_colon(self, text: str) -> str:
-        return self._remove(":", text)
+    @staticmethod
+    def _remove_colon(text: str) -> str:
+        return IP._remove(":", text)
 
-    def _remove_angle_brackets(self, text: str) -> str:
-        text = self._remove("<", text)
-        return self._remove(">", text)
+    @staticmethod
+    def _remove_angle_brackets(text: str) -> str:
+        text = IP._remove("<", text)
+        return IP._remove(">", text)
 
-    def _remove(self, character: str, text: str) -> str:
+    @staticmethod
+    def _remove(character: str, text: str) -> str:
         return re.sub(character, "", text)
-
-class Address:
-
-    def __init__(self):
-        self.number: int
-
-
-    def __str__(self):
-        pass
 
 
 if __name__ == '__main__':
-    ip().addr()
+    print(IP.addr())
