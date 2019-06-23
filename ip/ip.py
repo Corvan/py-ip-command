@@ -21,16 +21,18 @@ class Address:
     @staticmethod
     def show() -> Dict:
         output = IP.run('addr').stdout.decode()
-        regexes = {"number": r'(?P<number>[0-9]+): ',
-                   "name": r'(?P<name>[0-9a-zA-Z-@]+): ',
-                   "flags": r'(?:<)(?P<flags>(.*?))(?:>) ',
-                   "mtu": r'(?:mtu )(?P<mtu>[0-9]+) ',
-                   "qdisc": r'(?:qdisc )(?P<qdisc>[a-z]+) ',
-                   "state": r'(?:state )(?P<state>[A-Z]+) ',
-                   "group": r'(?:group )(?P<group>[a-z]+) ',
-                   "qlen": r'(?:qlen )(?P<qlen>[0-9]+)\n',
-                   "link_type": r'\s+(?:link/)(?P<link_type>[a-z]+) ',
-                   "link_mac_address": r'(?P<link_mac_address>([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))'}
+        regexes = {"number": r'(?P<number>[0-9]+):\s+',
+                   "name": r'(?P<name>[0-9a-zA-Z-@]+):\s+',
+                   "flags": r'(?:<)(?P<flags>(.*?))(?:>)\s+',
+                   "mtu": r'(?:mtu\s)(?P<mtu>[0-9]+)\s+',
+                   "qdisc": r'(?:qdisc\s)(?P<qdisc>[a-z]+)\s+',
+                   "state": r'(?:state\s)(?P<state>[A-Z]+)\s+',
+                   "group": r'(?:group\s)(?P<group>[a-z]+)\s+',
+                   "qlen": r'(?:qlen\s)(?P<qlen>[0-9]+)\s+',
+                   "link_type": r'(?:link/)(?P<link_type>[a-z]+)\s+',
+                   "link_mac_address": r'(?P<link_mac_address>([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))\s+',
+                   "link_mac_broadcast":
+                       r'(?:brd\s)(?P<link_mac_broadcast>([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))\s{1}'}
 
         all_pattern = re.compile(str().join(regexes.values()))
 
@@ -48,7 +50,8 @@ class Address:
                     "link":
                         {
                             "type": find.group('link_type'),
-                            "mac_address":  find.group('link_mac_address')
+                            "mac_address":  find.group('link_mac_address'),
+                            "mac_broadcast": find.group('link_mac_broadcast')
                         }
                  }
 
