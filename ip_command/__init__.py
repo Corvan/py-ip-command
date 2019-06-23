@@ -1,1 +1,1 @@
-from .ip import *
+from .ip_command import *

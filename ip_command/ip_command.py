@@ -5,7 +5,7 @@ from typing import Dict, List
 
 
 def run(command: str) -> subprocess.CompletedProcess:
-    ip_path = subprocess.run(['which', 'ip_command'], capture_output=True).stdout.decode().strip()
+    ip_path = subprocess.run(['which', 'ip'], capture_output=True).stdout.decode().strip()
     return subprocess.run([ip_path, command], capture_output=True)
 
 
