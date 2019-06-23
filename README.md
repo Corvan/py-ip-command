@@ -1,4 +1,4 @@
-py-ip
+py-ip-command
 ======
 Wrapping the Linux `ip` command in Python.
 
