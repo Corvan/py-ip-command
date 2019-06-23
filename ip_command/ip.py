@@ -30,9 +30,3 @@ class IP:
     def neigh() -> Neighbour:
         return Neighbour()
 
-
-if __name__ == '__main__':
-    print(IP
-          .addr()
-          .show())
-    print(IP.neigh().show())
