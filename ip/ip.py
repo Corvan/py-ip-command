@@ -1,7 +1,12 @@
 from __future__ import annotations
 import re
 import subprocess
-from typing import Dict
+from typing import Dict, List
+
+
+def run(command: str) -> subprocess.CompletedProcess:
+    ip_path = subprocess.run(['which', 'ip'], capture_output=True).stdout.decode().strip()
+    return subprocess.run([ip_path, command], capture_output=True)
 
 
 class IP:
@@ -9,11 +14,6 @@ class IP:
     @staticmethod
     def addr() -> Address:
         return Address()
-
-    @staticmethod
-    def run(command: str) -> subprocess.CompletedProcess:
-        ip_path = subprocess.run(['which', 'ip'], capture_output=True).stdout.decode().strip()
-        return subprocess.run([ip_path, command], capture_output=True)
 
 
 class Address:
