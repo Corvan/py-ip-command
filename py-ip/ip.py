@@ -12,9 +12,7 @@ class IP:
                    "interfaces": '(?P<interface>[0-9a-zA-Z-@]+: )',
                    "flags": '(?P<flags><(.*?)>)'}
 
-        all_pattern = re.compile(f"{regexes['numbers']}"
-                                 f"{regexes['interfaces']}"
-                                 f"{regexes['flags']}")
+        all_pattern = re.compile(str().join(regexes.values()))
 
         interfaces = dict()
         for find in re.finditer(all_pattern, output):
