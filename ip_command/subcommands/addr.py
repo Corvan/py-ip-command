@@ -52,7 +52,7 @@ class Address:
             "address_family": r'\s+(?P<address_family>((\binet\b)|(\binet6\b)))\s+',
             "ip_address": r'(?P<ipv6>(([0-9a-f]{0,4}:+){0,8}([0-9a-f]{0,4})/[0-9]{0,3}))|'  # IPv6
                           r'(?P<ipv4_address>((([0-9]{1,3}\.){3}[0-9]{0,3}/[0-9]{2}))) '    # IPv4
-                          r'(?:brd\s+)(?P<ipv4_broadcast>((([0-9]{1,3}\.){3}[0-9]{0,3})))'        # IPv4 broadcast
+                          r'(?:brd\s+)(?P<ipv4_broadcast>((([0-9]{1,3}\.){3}[0-9]{0,3})))'  # IPv4 broadcast
         }
 
         all_pattern = re.compile(str().join(regexes.values()))
