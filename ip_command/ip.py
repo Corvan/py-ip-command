@@ -1,12 +1,16 @@
 from __future__ import annotations
 import subprocess
-from .subcommands import Address
-from .subcommands import Neighbour
+
+from ip_command.subcommands import Address, Neighbour
 
 
 def run(command: str) -> subprocess.CompletedProcess:
-    ip_path = subprocess.run(['which', 'ip'], capture_output=True).stdout.decode().strip()
-    return subprocess.run([ip_path, command], capture_output=True)
+    try:
+        ip_path = subprocess.run(['which', 'ip'], capture_output=True).stdout.decode().strip()
+        return subprocess.run([ip_path, command], capture_output=True)
+    except subprocess.SubprocessError as e:
+        print(e)
+        exit(0)
 
 
 class IP:

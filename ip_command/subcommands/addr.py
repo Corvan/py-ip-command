@@ -1,13 +1,12 @@
 import re
 from typing import Dict, List
 
-from ip_command import run
-
 
 class Address:
 
     @staticmethod
     def show() -> Dict:
+        from ip_command.ip import run
         output = run('addr').stdout.decode()
         regexes = {"number": r'(?P<number>[0-9]+):\s+',
                    "name": r'(?P<name>[0-9a-zA-Z-@]+):\s+',
