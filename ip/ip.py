@@ -20,7 +20,7 @@ class Address:
 
     @staticmethod
     def show() -> Dict:
-        output = IP.run('addr').stdout.decode()
+        output = run('addr').stdout.decode()
         regexes = {"number": r'(?P<number>[0-9]+):\s+',
                    "name": r'(?P<name>[0-9a-zA-Z-@]+):\s+',
                    "flags": r'(?:<)(?P<flags>(.*?))(?:>)\s+',
@@ -32,7 +32,8 @@ class Address:
                    "link_type": r'(?:link/)(?P<link_type>[a-z]+)\s+',
                    "link_mac_address": r'(?P<link_mac_address>([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))\s+',
                    "link_mac_broadcast":
-                       r'(?:brd\s)(?P<link_mac_broadcast>([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))\s{1}'}
+                       r'(?:brd\s)(?P<link_mac_broadcast>([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))\s{1}',
+                   "addresses": r'(?P<addresses>(\s+inet.*\n.*\n)*)'}
 
         all_pattern = re.compile(str().join(regexes.values()))
 
@@ -52,23 +53,35 @@ class Address:
                             "type": find.group('link_type'),
                             "mac_address":  find.group('link_mac_address'),
                             "mac_broadcast": find.group('link_mac_broadcast')
-                        }
+                        },
+                    "addresses": Address._parse_addresses(find.group('addresses'))
                  }
 
         return interfaces
 
     @staticmethod
-    def _remove_colon(text: str) -> str:
-        return Address._remove(":", text)
+    def _parse_addresses(address_definitions: str) -> List[Dict]:
+        regexes = {
+            "address_family": r'\s+(?P<address_family>((\binet\b)|(\binet6\b)))\s+',
+            "ip_address": r'(?P<ipv6>(([0-9a-f]{0,4}:+){0,8}([0-9a-f]{0,4})/[0-9]{0,3}))|'  # IPv6
+                          r'(?P<ipv4_address>((([0-9]{1,3}\.){3}[0-9]{0,3}/[0-9]{2}))) '    # IPv4
+                          r'brd (?P<ipv4_broadcast>((([0-9]{1,3}\.){3}[0-9]{0,3})))'        # IPv4 broadcast
+        }
 
-    @staticmethod
-    def _remove_angle_brackets(text: str) -> str:
-        text = Address._remove("<", text)
-        return Address._remove(">", text)
+        all_pattern = re.compile(str().join(regexes.values()))
 
-    @staticmethod
-    def _remove(character: str, text: str) -> str:
-        return re.sub(character, "", text)
+        addresses = list()
+        for find in re.finditer(all_pattern, address_definitions):
+            address = {
+                "address_family": find.group('address_family'),
+            }
+            if find.group('ipv6'):
+                address['ip_address'] = find.group('ipv6')
+            elif find.group('ipv4_address'):
+                address['ip_address'] = find.group('ipv4_address')
+                address['broadcast'] = find.group('ipv4_broadcast')
+            addresses.append(address)
+        return addresses
 
 
 if __name__ == '__main__':
