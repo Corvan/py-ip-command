@@ -6,11 +6,15 @@ from ip_command.subcommands import Address, Neighbour
 
 def run(command: str) -> subprocess.CompletedProcess:
     try:
-        ip_path = subprocess.run(['which', 'ip'], capture_output=True).stdout.decode().strip()
+        subprocess_result = subprocess.run(['which', 'ip'], capture_output=True)
+        if subprocess_result.returncode == 1:
+            print("ip command not found")
+            exit(1)
+        ip_path = subprocess_result.stdout.decode().strip()
         return subprocess.run([ip_path, command], capture_output=True)
     except subprocess.SubprocessError as e:
         print(e)
-        exit(0)
+        exit(1)
 
 
 class IP:
