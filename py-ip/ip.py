@@ -21,22 +21,36 @@ class Address:
     @staticmethod
     def show() -> Dict:
         output = IP.run('addr').stdout.decode()
-        regexes = {"numbers": '(?P<number>[0-9]+: )',
-                   "interfaces": '(?P<interface>[0-9a-zA-Z-@]+: )',
-                   "flags": '(?P<flags><(.*?)>)',
-                   "mtu": '(?: mtu )(?P<mtu>[0-9]+)'}
+        regexes = {"number": r'(?P<number>[0-9]+): ',
+                   "name": r'(?P<name>[0-9a-zA-Z-@]+): ',
+                   "flags": r'(?:<)(?P<flags>(.*?))(?:>) ',
+                   "mtu": r'(?:mtu )(?P<mtu>[0-9]+) ',
+                   "qdisc": r'(?:qdisc )(?P<qdisc>[a-z]+) ',
+                   "state": r'(?:state )(?P<state>[A-Z]+) ',
+                   "group": r'(?:group )(?P<group>[a-z]+) ',
+                   "qlen": r'(?:qlen )(?P<qlen>[0-9]+)\n',
+                   "link_type": r'\s+(?:link/)(?P<link_type>[a-z]+) ',
+                   "link_mac_address": r'(?P<link_mac_address>([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))'}
 
         all_pattern = re.compile(str().join(regexes.values()))
 
         interfaces = dict()
         for find in re.finditer(all_pattern, output):
-            number = int(Address._remove_colon(find.group('number')))
-            name = Address._remove_colon(find.group('interface'))
-            flags = Address._remove_angle_brackets(find.group('flags')).split(",")
-            mtu = find.group('mtu')
-            interfaces[number] = {"name": name,
-                                  "flags": flags,
-                                  "mtu": mtu}
+            interfaces[int(find.group('number'))] = \
+                {
+                    "name": find.group('name'),
+                    "flags": find.group('flags').split(","),
+                    "mtu": int(find.group('mtu')),
+                    "qdisc": find.group('qdisc'),
+                    "state": find.group('state'),
+                    "group": find.group('group'),
+                    "qlen": int(find.group('qlen')),
+                    "link":
+                        {
+                            "type": find.group('link_type'),
+                            "mac_address":  find.group('link_mac_address')
+                        }
+                 }
 
         return interfaces
 
