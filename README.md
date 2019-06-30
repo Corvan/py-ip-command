@@ -2,6 +2,18 @@ py-ip-command
 ======
 Wrapping the Linux `ip` command in Python.
 
+Find me on pypi: https://pypi.org/project/py-ip-command/
+
+on GitHub: https://github.com/Corvan/py-ip-command
+
+or install me:
+```bash
+pip install py-ip-command
+```
+```bash
+pipenv install py-ip-command
+```
+
 Note
 -----
 This is still work in progess, but you can already use it. Help is very welcome!
