@@ -55,8 +55,7 @@ class Addr:
         return interfaces
 
     @staticmethod
-    def _parse_addresses(address_definitions: str) -> Union[List[Dict], List[Union[ipaddress.IPv4Interface,
-                                                                                   ipaddress.IPv6Interface]]]:
+    def _parse_addresses(address_definitions: str) -> List[Union[ipaddress.IPv4Interface, ipaddress.IPv6Interface]]:
         regexes = {
             "address_family": r'\s+(?P<address_family>((\binet\b)|(\binet6\b)))\s+',
             "ip_address": r'(?P<ip>(([0-9a-f]{0,4}:+){0,8}([0-9a-f]{0,4})/[0-9]{0,3})|'  # IPv6
