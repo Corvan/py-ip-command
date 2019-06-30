@@ -25,6 +25,12 @@ class Address:
 
     @staticmethod
     def show(as_dict: bool = False) -> Union[List[Interface], Dict]:
+        """
+        calls `ip addr show`
+        :param as_dict: return a dictionary of data elements instead of an object-oriented representation
+        :type as_dict: builtins.bool
+        :rtype Union[List[Interface], Dict]:
+        """
         from ip_command.ip import run
         output = run(['addr', 'show']).stdout.decode()
 
@@ -67,6 +73,9 @@ class Address:
 
 @dataclass
 class Interface:
+    """
+    A network interface
+    """
 
     number: int
     name: str
