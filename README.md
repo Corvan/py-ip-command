@@ -20,7 +20,7 @@ and then you can issue commands like
  ``` 
  with
  ```python
-IP.addr().show()
+IP.addr.show()
 ```
 or 
 ```bash 
@@ -28,7 +28,9 @@ ip neigh show
 ```
 with
 ```python
-IP.neigh().show()
+IP.neigh.show()
 ```
-The return of both is a dict (addr) or a list (neigh) consisting of all the information the commands return but split 
-into single elements. 
+The return of both is 
+* An object oriented representation of the data reurned by both commands
+* a dict (addr) or a list of dicts (neigh) consisting of all the information the commands return but split 
+into single elements, if you pass `as_dict=True` to `show()` or simply call `show(True)`
