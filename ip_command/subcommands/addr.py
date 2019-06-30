@@ -51,20 +51,18 @@ class Address:
     def _parse_addresses(address_definitions: str, as_dict: bool) -> Union[List[Dict], List[IpAddress]]:
         regexes = {
             "address_family": r'\s+(?P<address_family>((\binet\b)|(\binet6\b)))\s+',
-            "ip_address": r'(?P<ipv6>(([0-9a-f]{0,4}:+){0,8}([0-9a-f]{0,4})/[0-9]{0,3}))|'  # IPv6
-                          r'(?P<ipv4>((([0-9]{1,3}\.){3}[0-9]{0,3}/[0-9]{2}))) '            # IPv4
+            "ip_address": r'(?P<ip>(([0-9a-f]{0,4}:+){0,8}([0-9a-f]{0,4})/[0-9]{0,3})|'  # IPv6
+                          r'([0-9]{1,3}\.){3}[0-9]{0,3}/[0-9]{2})\s+'            # IPv4
         }
 
         all_pattern = re.compile(str().join(regexes.values()))
 
         addresses = list()
         for find in re.finditer(all_pattern, address_definitions):
-            if find.group('ipv6'):
-                address = IpAddress(family=find.group('address_family'),
-                                    address=ipaddress.ip_interface(find.group('ipv6')))
-            else:
-                address = IpAddress(family=find.group('address_family'),
-                                    address=ipaddress.ip_interface(find.group('ipv4')))
+
+            address = IpAddress(family=find.group('address_family'),
+                                address=ipaddress.ip_interface(find.group('ip')))
+
             addresses.append(address)
         if as_dict:
             return [dataclasses.asdict(address) for address in addresses]
