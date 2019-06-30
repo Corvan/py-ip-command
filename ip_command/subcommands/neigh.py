@@ -27,11 +27,12 @@ class Neigh:
 
             neighbour = Neighbour(
                 address=ipaddress.ip_address(find.group('ip')),
-                device=find.group('device')
+                device=find.group('device'),
+                status=find.group('status')
             )
             if find.group('lladdr'):
                 neighbour.lladdr = find.group('lladdr')
-            neighbour.status = find.group('status')
+
             neighbours.append(neighbour)
 
         if as_dict:
@@ -43,5 +44,6 @@ class Neigh:
 class Neighbour:
 
     address: Union[ipaddress.IPv4Address, ipaddress.IPv6Address]
+    status: str
     device: str
     lladdr: str = field(default="")
