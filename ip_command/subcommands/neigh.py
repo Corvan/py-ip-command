@@ -2,13 +2,11 @@ from __future__ import annotations
 import dataclasses
 import re
 import ipaddress
-from dataclasses import dataclass
 from typing import Dict, List, Union
 
 from ip_command.model import Neighbour
 
 
-@dataclass
 class Neigh:
 
     _regexes = {
