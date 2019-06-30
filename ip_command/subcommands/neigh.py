@@ -1,33 +1,47 @@
+from __future__ import annotations
+import dataclasses
 import re
-from typing import Dict, List
+import ipaddress
+from dataclasses import dataclass, field
+from typing import Dict, List, Union
 
 
-class Neighbour:
+@dataclass
+class Neigh:
+
+    regexes = {
+        "ip_address": r'(?P<ip>([0-9a-f]{0,4}:+){0,8}([0-9a-f]{0,4})|([0-9]{1,3}\.){3}[0-9]{0,3})\s+',
+        "device": r'(?:dev\s+)(?P<device>[a-z0-9-]*)\s+',
+        "lladr": r'((?:lladdr\s+)(?P<lladdr>([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))\s+)?',
+        "status": r'(?P<status>[A-Z]*)'
+    }
+    all_pattern = re.compile(str().join(regexes.values()))
 
     @staticmethod
-    def show() -> List[Dict]:
+    def show(as_dict: bool = False) -> Union[List[Dict], List[Neighbour]]:
         from ip_command.ip import run
-        output = run(['neigh', 'show']).stdout.decode().splitlines()
-        regexes = {
-            "ip_address": r'(?P<ipv4_address>(([0-9a-f]{0,4}:+){0,8}([0-9a-f]{0,4}))|'  # IPv6
-                          r'(?P<ipv6_address>(([0-9]{1,3}\.){3}[0-9]{0,3})))\s+',  # IPv4
-            "device": r'(?:dev\s+)(?P<device>[a-z0-9-]*)\s+',
-            "lladr": r'((?:lladdr\s+)(?P<lladdr>([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))\s+)?',
-            "status": r'(?P<status>[A-Z]*)'
+        output = run(['neigh', 'show']).stdout.decode()
 
-        }
-
-        all_pattern = re.compile(str().join(regexes.values()))
         neighbours = list()
-        for line in output:
+        for find in re.finditer(Neigh.all_pattern, output):
 
-            find = re.search(all_pattern, line)
-            neighbour = {
-                "address": find.group('ipv4_address') if find.group('ipv4_address') else find.group('ipv6_address'),
-                "device": find.group('device')
-            }
+            neighbour = Neighbour(
+                address=ipaddress.ip_address(find.group('ip')),
+                device=find.group('device')
+            )
             if find.group('lladdr'):
-                neighbour['lladdr'] = find.group('lladdr')
-            neighbour['status'] = find.group('status')
+                neighbour.lladdr = find.group('lladdr')
+            neighbour.status = find.group('status')
             neighbours.append(neighbour)
+
+        if as_dict:
+            return [dataclasses.asdict(neighbour) for neighbour in neighbours]
         return neighbours
+
+
+@dataclass
+class Neighbour:
+
+    address: Union[ipaddress.IPv4Address, ipaddress.IPv6Address]
+    device: str
+    lladdr: str = field(default="")
