@@ -1,2 +1,2 @@
-from .addr import Address
+from .addr import Addr
 from .neigh import Neigh

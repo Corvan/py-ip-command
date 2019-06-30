@@ -2,8 +2,10 @@ from __future__ import annotations
 import dataclasses
 import re
 import ipaddress
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, List, Union
+
+from ip_command.model import Neighbour
 
 
 @dataclass
@@ -31,7 +33,7 @@ class Neigh:
                 status=find.group('status')
             )
             if find.group('lladdr'):
-                neighbour.lladdr = find.group('lladdr')
+                neighbour.mac_address = find.group('lladdr')
 
             neighbours.append(neighbour)
 
@@ -40,10 +42,3 @@ class Neigh:
         return neighbours
 
 
-@dataclass
-class Neighbour:
-
-    address: Union[ipaddress.IPv4Address, ipaddress.IPv6Address]
-    status: str
-    device: str
-    lladdr: str = field(default="")

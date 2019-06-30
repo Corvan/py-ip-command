@@ -3,11 +3,12 @@ from __future__ import annotations
 import dataclasses
 import ipaddress
 import re
-from dataclasses import dataclass
 from typing import Dict, List, Pattern, Union
 
+from ip_command.model import Interface, Link
 
-class Address:
+
+class Addr:
     _regexes = {"number": r'(?P<number>[0-9]+):\s+',
                 "name": r'(?P<name>[0-9a-zA-Z-@]+):\s+',
                 "flags": r'(?:<)(?P<flags>(.*?))(?:>)\s+',
@@ -35,7 +36,7 @@ class Address:
         output = run(['addr', 'show']).stdout.decode()
 
         interfaces: List[Interface] = list()
-        for find in re.finditer(Address._all_pattern, output):
+        for find in re.finditer(Addr._all_pattern, output):
             interfaces.append(Interface(number=int(find.group('number')),
                                         name=find.group('name'),
                                         flags=find.group('flags').split(','),
@@ -47,16 +48,15 @@ class Address:
                                         link=Link(type=find.group('link_type'),
                                                   mac_address=find.group('link_mac_address'),
                                                   mac_broadcast=find.group('link_mac_broadcast')),
-                                        addresses=Address._parse_addresses(find.group('addresses'))))
+                                        addresses=Addr._parse_addresses(find.group('addresses'))))
         if as_dict:
             return {interface.number: dataclasses.asdict(interface) for interface in interfaces}
 
         return interfaces
 
     @staticmethod
-    def _parse_addresses(address_definitions: str) -> Union[List[Dict],
-                                                                           List[Union[ipaddress.IPv4Interface,
-                                                                                      ipaddress.IPv6Interface]]]:
+    def _parse_addresses(address_definitions: str) -> Union[List[Dict], List[Union[ipaddress.IPv4Interface,
+                                                                                   ipaddress.IPv6Interface]]]:
         regexes = {
             "address_family": r'\s+(?P<address_family>((\binet\b)|(\binet6\b)))\s+',
             "ip_address": r'(?P<ip>(([0-9a-f]{0,4}:+){0,8}([0-9a-f]{0,4})/[0-9]{0,3})|'  # IPv6
@@ -71,29 +71,3 @@ class Address:
         return addresses
 
 
-@dataclass
-class Interface:
-    """
-    A network interface
-    """
-
-    number: int
-    name: str
-    flags: List[str]
-    mtu: int
-    qdisc: str
-    state: str
-    group: str
-    qlen: str
-    link: Link
-    addresses: List[Union[ipaddress.IPv4Interface, ipaddress.IPv6Interface]]
-
-
-@dataclass
-class Link:
-    """
-    An :Interface:'s physical link
-    """
-    type: str
-    mac_address: str
-    mac_broadcast: str
