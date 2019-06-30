@@ -9,13 +9,13 @@ from typing import Dict, List, Union
 @dataclass
 class Neigh:
 
-    regexes = {
+    _regexes = {
         "ip_address": r'(?P<ip>([0-9a-f]{0,4}:+){0,8}([0-9a-f]{0,4})|([0-9]{1,3}\.){3}[0-9]{0,3})\s+',
         "device": r'(?:dev\s+)(?P<device>[a-z0-9-]*)\s+',
         "lladr": r'((?:lladdr\s+)(?P<lladdr>([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))\s+)?',
         "status": r'(?P<status>[A-Z]*)'
     }
-    all_pattern = re.compile(str().join(regexes.values()))
+    _all_pattern = re.compile(str().join(_regexes.values()))
 
     @staticmethod
     def show(as_dict: bool = False) -> Union[List[Dict], List[Neighbour]]:
@@ -23,7 +23,7 @@ class Neigh:
         output = run(['neigh', 'show']).stdout.decode()
 
         neighbours = list()
-        for find in re.finditer(Neigh.all_pattern, output):
+        for find in re.finditer(Neigh._all_pattern, output):
 
             neighbour = Neighbour(
                 address=ipaddress.ip_address(find.group('ip')),
