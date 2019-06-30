@@ -2,7 +2,7 @@ from __future__ import annotations
 import subprocess
 from typing import Iterable
 
-from ip_command.subcommands import Address, Neighbour
+from ip_command.subcommands import Address, Neigh
 
 
 def run(command: Iterable[str]) -> subprocess.CompletedProcess:
@@ -22,11 +22,5 @@ def run(command: Iterable[str]) -> subprocess.CompletedProcess:
 
 class IP:
 
-    @staticmethod
-    def addr() -> Address:
-        return Address()
-
-    @staticmethod
-    def neigh() -> Neighbour:
-        return Neighbour()
-
+    addr: Address = Address()
+    neigh: Neigh = Neigh()
